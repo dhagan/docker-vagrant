@@ -1,0 +1,11 @@
+[Unit]
+Description=Enables IPv4 Routing
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/enable_routing.sh
+TimeoutStartSec=0
+
+[Install]
+WantedBy=default.target
