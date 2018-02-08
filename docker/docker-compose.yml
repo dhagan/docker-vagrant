@@ -34,9 +34,7 @@ services:
         - tas-nginx
 
   tascore-api:
-    build: 
-      context: ./workspace/tascore-api/src
-      dockerfile: Dockerfile
+    build: ./workspace/tascore-api/src
     container_name: tascore-api
     volumes:
      - ./workspace/tascore-api/src:/var/app
@@ -45,14 +43,31 @@ services:
       - "TAS_FILESYSTEM_DATA_ROOT=/var/log/tas"
       - "DEBUG=api,api-internal,data,fs,core,memory,webclient"
       - "LIVE_HTTP=true"
-      # - "TAS_PROVIDER_CONFIG=azure"
-      # - "TAS_AZURE_STORAGE_NAME=PUT_KEY_HERE"
-      # - "TAS_AZURE_STORAGE_KEY=PUT_KEY_HERE"
+      - "TAS_PROVIDER_LOGGING=fs"
+      - "TAS_PROVIDER_CONFIG=azure"
+      - "TAS_AZURE_STORAGE_NAME=tasstorage01"
+      - "TAS_AZURE_STORAGE_KEY=IM+4OtpmRgAd2XXIqrRYOrR5SM2rPhCNDFhLF52maDAk4nMchaPohrwoOZrAwlIvT2jAzU0Nynq+9BF9Lr+PUw=="
       - "TAS_ELASTICSEARCH_CONNECTION_STRING=http://127.0.0.1:9200"
       - "TAS_HAPI_FHIR_URL=http://127.0.0.1:8080/VA-FHIR-Server/fhir"
     network_mode: service:tas-nginx
     depends_on:
         - tas-nginx
+
+  # tas-reporting:
+  #   build: ./workspace/reporting
+  #   container_name: tas-reporting
+  #   network_mode: service:tas-nginx
+  #   depends_on:
+  #       - tas-nginx
+
+  # tas-fhir:
+  #   build:
+  #     context: ./workspace/fhir
+  #     dockerfile: VA-FHIR-Server/Dockerfile
+  #   container_name: tas-fhir
+  #   network_mode: service:tas-nginx
+  #   depends_on:
+  #       - tas-nginx
 
   # tas-elasticsearch:
   #   image: docker.elastic.co/elasticsearch/elasticsearch:6.1.3
