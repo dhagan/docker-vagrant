@@ -86,6 +86,11 @@ boxes = [
 
 VAGRANTFILE_API_VERSION = "2"
 
+# DJH 2/15/2018 migrate to vagrant cloud
+# see https://github.com/hashicorp/vagrant/issues/9442
+
+Vagrant::DEFAULT_SERVER_URL.replace('https://vagrantcloud.com')
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.hostmanager.enabled = true
   config.vm.box = "centos/7"
