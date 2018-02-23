@@ -2,20 +2,20 @@
 
 # vi: set ft=ruby :
 
-vagrant_arg = ARGV[0]
-if vagrant_arg == 'up'
-  print "Collecting credentials to pull source from bitbucket\n"
-  print "Please enter bitbucket username: "
-  STDOUT.flush
-  username = STDIN.gets.chomp
-  # 8m is the control code to hide characters
-  print "Please enter bitbucket password: \e[0;8m"
-  STDOUT.flush
-  password = STDIN.gets.chomp
-  # 0m is the control code to reset formatting attributes
-  puts "\e[0m"
-  STDOUT.flush
-end
+# vagrant_arg = ARGV[0]
+# if vagrant_arg == 'up'
+#   print "Collecting credentials to pull source from bitbucket\n"
+#   print "Please enter bitbucket username: "
+#   STDOUT.flush
+#   username = STDIN.gets.chomp
+#   # 8m is the control code to hide characters
+#   # print "Please enter bitbucket password: \e[0;8m"
+#   # STDOUT.flush
+#   # password = STDIN.gets.chomp
+#   # 0m is the control code to reset formatting attributes
+#   puts "\e[0m"
+#   STDOUT.flush
+# end
 
 # required_plugins = %w( vagrant-hostmanager vagrant-triggers vagrant-vbguest )
 # plugin_installed = false
@@ -171,11 +171,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       box.vm.provision "shell", :inline => "echo prepare docker workspace"
       box.trigger.after :up, :stdout => true, :stderr => true do
-        password_cmd = "sudo ./setup_passwords.sh vagrant #{password}"
-        prepare_cmd = "./prepare.sh #{username} #{password}"
-        run "vagrant ssh dockerenv -c \"cd ~; #{password_cmd} && cd ~/docker && #{prepare_cmd}\""
+        password_cmd = "sudo ./setup_passwords.sh vagrant"
+        # prepare_cmd = "./prepare.sh #{username}"
+        # run "vagrant ssh dockerenv -c \"cd ~; #{password_cmd} && cd ~/docker && #{prepare_cmd}\""
+        run "vagrant ssh dockerenv -c \"cd ~; #{password_cmd}\""
       end
     end
   end
 end
-

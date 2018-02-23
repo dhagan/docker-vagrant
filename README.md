@@ -2,11 +2,69 @@
 
 ## Setup
 
-Run:
+There are two possible paths for setup: New SSH Keys and Existing Keys
+
+### New SSH Keys
+
+**1**) Create the single VM:
 
     vagrant up
 
-Upon successful completion, the VM is setup.
+Upon successful completion, the VM is setup. Next, you need to install your SSH keys and pull the repos:
+
+To access the VM, SSH to the following location (username and password are `vagrant`/`vagrant`):
+
+    192.168.100.10
+
+**2**) Create keys with the following:
+
+	ssh-keygen
+
+Set the location to `~/.ssh/halfaker_bb_id_rsa`
+
+**3**) Post your public key to Bitbucket.org.
+
+Follow the instructions at the following link for complete details:
+
+	https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html#SetupanSSHkey-ssh1
+
+**4**) Pull and setup repos:
+
+	cd docker
+	./prepare.sh
+
+It's important to backup your id_rsa (**keep private**) and id_rsa.pub. You can use keys-template.sh as a place to store your keys for future deployments. 
+
+### Existing SSH Keys
+
+**1**) Before beginning, make sure you placed your SSH keys into the `keys.sh` file (rename from `keys-template.sh`). Bitbucket requires these keys.
+
+**2**) Create the single VM:
+
+    vagrant up
+
+Upon successful completion, the VM is setup. Next, you need to install your SSH keys and pull the repos:
+
+To access the VM, SSH to the following location (username and password are `vagrant`/`vagrant`):
+
+    192.168.100.10
+
+**3**) Install your SSH keys with the script your updated in step 1:
+
+	./docker/keys.sh
+
+**3b**, **OPTIONAL**) To avoid getting asked for your password repeatedly throughout the download process, run (copy/paste) the following in SSH to allow the next script to pull your repos:
+
+    chmod 600 ~/.ssh/config
+    eval `ssh-agent -s`
+    ssh-add ~/.ssh/halfaker_bb_id_rsa
+
+**4**) Pull and setup repos:
+
+	cd docker
+	./prepare.sh
+
+Setup is complete.
 
 ## Usage
 
@@ -48,7 +106,7 @@ This will build and start the entire Docker infrastructure.
 
 The following containers will be started in the background (more to be added as the project progresses):
 
-* nginx (`tas-nginx`)
+* nginx (`tas-gateway`)
 * TAS Relay (`tas-relay`)
 * TAS Core API (`tascore-api`)
 * TAS Core UI (`tascore-ui`)
@@ -97,19 +155,19 @@ Run Angular e2e tests:
 
 ### Node
 
-Node uses the `tas/n8` image, not the `tas/ng` image.
+Node uses the `tas/node8` image, not the `tas/ng` image.
 
 Run Mocha tests:
 
-    docker run -v `pwd`:/var/app tas/n8 mocha
+    docker run -v `pwd`:/var/app tas/node8 mocha
 
 Run Mocha tests with watch:
 
-    docker run -v `pwd`:/var/app tas/n8 mocha -w
+    docker run -v `pwd`:/var/app tas/node8 mocha -w
     
 Run Mocha tests on specific file with watch:
 
-    docker run -v `pwd`:/var/app tas/n8 mocha -w test/my-file-name.js
+    docker run -v `pwd`:/var/app tas/node8 mocha -w test/my-file-name.js
     
 ## Viewing Docker Output
 
@@ -119,7 +177,7 @@ To view the output of each, you can use the `docker logs` command:
 
 This will let you view your entire infrastructure at one. Run each of the following in a different SSH session for the complete picture:
 
-    docker logs tas-nginx -f
+    docker logs tas-gateway -f
     docker logs tas-relay -f
     docker logs tascore-api -f
     docker logs tascore-ui -f
@@ -171,9 +229,9 @@ To start a container manually, use a variant of one of the following:
 
 ### nginx
 
-    docker run -d --rm --name tas-nginx -p 80:80 -p 3000:3000 -p 3001:3001 -p 8080:8080 -p 9200:9200 tas-nginx
+    docker run -d --rm --name tas-gateway -p 80:80 -p 3000:3000 -p 3001:3001 -p 8080:8080 -p 9200:9200 tas-gateway
 
-Because all other containers attach to the `tas-nginx` container, `tas-nginx` must be deployed first.
+Because all other containers attach to the `tas-gateway` container, `tas-gateway` must be deployed first.
 
 ### TAS API RELAY
 
@@ -181,7 +239,7 @@ Because all other containers attach to the `tas-nginx` container, `tas-nginx` mu
         --name tas-relay \
         -dt \
         --rm \
-        --network container:tas-nginx \
+        --network container:tas-gateway \
         -v `pwd`/tas-relay/src:/var/app \
         -e "DEVELOPMENT=true" \
         -e "PORT=3000" \
@@ -193,7 +251,7 @@ Because all other containers attach to the `tas-nginx` container, `tas-nginx` mu
         --name tascore-api \
         -dt \
         --rm \
-        --network container:tas-nginx \
+        --network container:tas-gateway \
         -v `pwd`/tascore-api/src:/var/app \
         -e "PORT=3001" \
         -e "TAS_FILESYSTEM_DATA_ROOT=/var/log/tas" \
@@ -204,17 +262,17 @@ Because all other containers attach to the `tas-nginx` container, `tas-nginx` mu
 
 ### FHIR
 
-    docker run --name tas-fhir --rm -dt --network container:tas-nginx tas-fhir
+    docker run --name tas-fhir --rm -dt --network container:tas-gateway tas-fhir
 
 ### TAS Core UI
 
-    docker run --name tascore-ui -dt --rm --network container:tas-nginx -v `pwd`/tascore-ui:/var/app tascore-ui
+    docker run --name tascore-ui -dt --rm --network container:tas-gateway -v `pwd`/tascore-ui:/var/app tascore-ui
 
 ### Elasticsearch
 
     docker run \
      -dt \
-     --network container:tas-nginx \
+     --network container:tas-gateway \
      -v `pwd`/elasticsearch-data:/usr/share/elasticsearch/data \
      -e "xpack.security.enabled=false" \
      -e "discovery.type=single-node" \
