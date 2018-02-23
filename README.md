@@ -107,7 +107,6 @@ This will build and start the entire Docker infrastructure.
 The following containers will be started in the background (more to be added as the project progresses):
 
 * nginx (`tas-gateway`)
-* TAS Relay (`tas-relay`)
 * TAS Core API (`tascore-api`)
 * TAS Core UI (`tascore-ui`)
 * FHIR (`tas-fhir`)
@@ -118,8 +117,6 @@ Once the infrastructure is running, you an access all components via a single en
 
 * UI - `http://192.168.100.10`
 
-* RELAY - `http://192.168.100.10/api/core/v1/health`
-
 * TASCORE API - `http://192.168.100.10:3001/_/v1/health`
 
 * FHIR - `http://192.168.100.10:8080`
@@ -128,7 +125,7 @@ Once the infrastructure is running, you an access all components via a single en
 
 * Elasticsearch (same as previous, just direct access) - `http://192.168.100.10:9200`
 
-> Relay access follows the pattern of /api/{API\_NAME}/{API\_PARAMETERS}. To access an API directly, use underscore (`_`) as seen above.
+> Gateway access follows the pattern of /api/{API\_NAME}/{API\_PARAMETERS}. To access an API directly, use underscore (`_`) as seen above.
 
 ## Ng Image
 
@@ -178,7 +175,6 @@ To view the output of each, you can use the `docker logs` command:
 This will let you view your entire infrastructure at one. Run each of the following in a different SSH session for the complete picture:
 
     docker logs tas-gateway -f
-    docker logs tas-relay -f
     docker logs tascore-api -f
     docker logs tascore-ui -f
     docker logs tas-fhir -f
@@ -232,18 +228,6 @@ To start a container manually, use a variant of one of the following:
     docker run -d --rm --name tas-gateway -p 80:80 -p 3000:3000 -p 3001:3001 -p 8080:8080 -p 9200:9200 tas-gateway
 
 Because all other containers attach to the `tas-gateway` container, `tas-gateway` must be deployed first.
-
-### TAS API RELAY
-
-    docker run \
-        --name tas-relay \
-        -dt \
-        --rm \
-        --network container:tas-gateway \
-        -v `pwd`/tas-relay/src:/var/app \
-        -e "DEVELOPMENT=true" \
-        -e "PORT=3000" \
-        tas-relay
 
 ### TAS Core API
 
