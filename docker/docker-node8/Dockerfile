@@ -5,4 +5,4 @@ RUN npm install pm2@2.9.3 mocha@4.1.0 -g && \
 
 WORKDIR /var/app
 
-CMD ["sh"]
+CMD  ["sh"]

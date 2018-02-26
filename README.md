@@ -2,17 +2,17 @@
 
 ## Setup
 
-There are two possible paths for setup: New SSH Keys and Existing Keys
+There are two possible paths for setup: **New SSH Keys** and **Existing Keys**.
 
-### New SSH Keys
+### New SSH Keys (easier)
 
 **1**) Create the single VM:
 
     vagrant up
 
-Upon successful completion, the VM is setup. Next, you need to install your SSH keys and pull the repos:
+Upon successful completion, the VM is setup.
 
-To access the VM, SSH to the following location (username and password are `vagrant`/`vagrant`):
+SSH to the following location (username and password are `vagrant`/`vagrant`):
 
     192.168.100.10
 
@@ -20,13 +20,20 @@ To access the VM, SSH to the following location (username and password are `vagr
 
 	ssh-keygen
 
-Set the location to `~/.ssh/halfaker_bb_id_rsa`
+Though the default location is fine, to avoid conflict, you might consider set the location to `/home/vagrant/.ssh/halfaker_bb_id_rsa`
 
 **3**) Post your public key to Bitbucket.org.
 
 Follow the instructions at the following link for complete details:
 
-	https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html#SetupanSSHkey-ssh1
+[https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html#SetupanSSHkey-ssh1](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html#SetupanSSHkey-ssh1)
+
+To summarize: copy the contents of `/home/vagrant/.ssh/halfaker_bb_id_rsa.pub` to the "Add SSH key" area in Bitbucket settings. 
+
+**3b**, **OPTIONAL**) To avoid getting asked for your password repeatedly throughout the download process, run (copy/paste) the following in SSH to allow the next script to pull your repos:
+
+    eval `ssh-agent -s`
+    ssh-add ~/.ssh/halfaker_bb_id_rsa
 
 **4**) Pull and setup repos:
 
@@ -35,9 +42,9 @@ Follow the instructions at the following link for complete details:
 
 It's important to backup your id_rsa (**keep private**) and id_rsa.pub. You can use keys-template.sh as a place to store your keys for future deployments. 
 
-### Existing SSH Keys
+### Existing SSH Keys (advanced / more streamlined)
 
-**1**) Before beginning, make sure you placed your SSH keys into the `keys.sh` file (rename from `keys-template.sh`). Bitbucket requires these keys.
+**1**) Before beginning, make sure you placed your SSH keys into the `keys.sh` file. Bitbucket requires these keys.
 
 **2**) Create the single VM:
 
@@ -78,7 +85,7 @@ Username and password are `vagrant`/`vagrant`. This will place you in your home 
 
 This gives you full access to the VM.
 
-SSH into the machine as many times as needed with different SSH session. This will be important when you want to monitor multiple parts of TAS simultaneously.
+**TIP:** You can SSH into the machine as many times as needed with different SSH session. This will be important when you want to monitor multiple parts of TAS simultaneously.
 
 ### File Access
 
@@ -111,13 +118,15 @@ The following containers will be started in the background (more to be added as 
 * TAS Core UI (`tascore-ui`)
 * FHIR (`tas-fhir`)
 
+**TIP:** Modify the `docker-compose.yml` file to meet your needs at the moment. You may not always need the UI, database, queue, or FHIR server.
+
 ## Accessing the in infrastructure
 
 Once the infrastructure is running, you an access all components via a single entry point (192.168.100.10 is just a sample IP):
 
 * UI - `http://192.168.100.10`
 
-* TASCORE API - `http://192.168.100.10:3001/_/v1/health`
+* TASCORE API - `http://192.168.100.10:3001/_/v1/health` (also: `http://192.168.100.10:3001/api/core/v1/health`)
 
 * FHIR - `http://192.168.100.10:8080`
 
