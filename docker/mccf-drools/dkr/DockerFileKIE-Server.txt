@@ -1,0 +1,45 @@
+#################################################################################
+# Dockerfile that provides the image for JBoss KIE Server 7.5.0.Final
+#################################################################################
+
+####### BASE ############
+FROM jboss/wildfly:latest
+
+####### ENVIRONMENT ##########
+# JBOSS_HOME /opt/jboss/wildfly
+# JAVA_HOME /usr/lib/jvm/java
+# HOME /root
+ENV JBOSS_BIND_ADDRESS 0.0.0.0
+# ENV KIE_REPOSITORY https://repository.jboss.org/nexus/content/groups/public-jboss
+ENV KIE_VERSION 7.3.0.Final
+ENV KIE_CLASSIFIER ee7
+ENV KIE_CONTEXT_PATH kie-server
+ENV JAVA_OPTS -Xms256m -Xmx512m -Djava.net.preferIPv4Stack=true
+
+###### SET USER root #########
+USER root
+
+###### INSTALL PACKAGES ######
+RUN yum install -y net-tools
+
+#ADD war/kie-server-7.3.0.Final-ee7.war /opt/jboss/wildfly/kie-server.war
+ADD war/kie-server-7.3.1-20171007.192308-74-ee7.war /opt/jboss/wildfly/kie-server.war
+ADD etc/start_kie-wb.sh $JBOSS_HOME/bin/start_kie-wb.sh
+
+RUN chown jboss:jboss $JBOSS_HOME/kie-server.war
+RUN chown jboss:jboss $JBOSS_HOME/bin/start_kie-wb.sh
+
+##### SWITCH BACK TO jboss ####
+USER jboss
+
+####### KIE-SERVER ############
+# RUN curl -o /opt/jboss/wildfly/kie-server.war https://repository.jboss.org/nexus/content/groups/public-jboss/org/kie/server/kie-server/7.3.1-SNAPSHOT/kie-server-7.3.1-20171007.192308-74-ee7.war && \
+RUN unzip -q /opt/jboss/wildfly/kie-server.war -d /opt/jboss/wildfly/standalone/deployments/kie-server.war &&  \
+touch /opt/jboss/wildfly/standalone/deployments/kie-server.war.dodeploy &&  \
+rm -rf /opt/jboss/wildfly/kie-server.war
+
+####### RUNNING DROOLS-WB #####
+WORKDIR $JBOSS_HOME/bin/
+CMD ["./start_kie-wb.sh"]
+
+# jboss/kie-server:latest

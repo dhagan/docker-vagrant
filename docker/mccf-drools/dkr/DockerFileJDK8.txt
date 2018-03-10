@@ -1,0 +1,19 @@
+FROM jboss/base:latest
+
+# User root user to install software
+USER root
+
+RUN rpm --rebuilddb
+RUN yum -y install yum-plugin-ovl
+
+# Install necessary packages
+RUN yum -y install java-1.8.0-openjdk-devel 
+RUN yum clean all
+
+# Switch back to jboss user
+USER jboss
+
+# Set the JAVA_HOME variable to make it clear where Java is located
+ENV JAVA_HOME /usr/lib/jvm/java
+
+# jboss/base-jdk:latest
