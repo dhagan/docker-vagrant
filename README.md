@@ -1,5 +1,13 @@
 # Docker Development Environment
 
+## Drools setup
+
+vagrant up
+vagrant ssh
+cd docker/drools-mccf
+./get-war.sh
+docker-compose -f dc-drools.yml up
+
 ## Setup
 
 There are two possible paths for setup: **New SSH Keys** and **Existing Keys**.
