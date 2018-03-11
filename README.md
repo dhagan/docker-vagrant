@@ -3,9 +3,13 @@
 ## Drools setup
 
 vagrant up
+
 vagrant ssh
+
 cd docker/drools-mccf
+
 ./get-war.sh
+
 docker-compose -f dc-drools.yml up
 
 ## Setup
