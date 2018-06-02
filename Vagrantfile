@@ -35,13 +35,13 @@
 #:forwards => {80 => 1090, 8080 => 5080, 8081 => 5081, 4444 => 4444, 4201 => 4201, 4873 => 4873, 8090 => 5090 },
 
 boxes = [
-  {   :name => :dockerenv,
-      :group => "dockerenv",
+  {   :name => :djhenv,
+      :group => "djhenv",
       :boxipaddress => "192.168.100.10",
       :mem => "2048",
       :sshcommands => [
         'if [ ! -f "/home/vagrant/.ssh/id_rsa" ]; then ssh-keygen -t rsa -N "" -f /home/vagrant/.ssh/id_rsa; fi',
-        'if [ -f "/home/vagrant/.ssh/id_rsa.pub" ]; then cp /home/vagrant/.ssh/id_rsa.pub /vagrant/dockerenv.pub; fi',
+        'if [ -f "/home/vagrant/.ssh/id_rsa.pub" ]; then cp /home/vagrant/.ssh/id_rsa.pub /vagrant/djhenv.pub; fi',
         'cat /vagrant/ssh_config >> /home/vagrant/.ssh/config',
         'chown -R vagrant:vagrant /home/vagrant/.ssh/',
       ],
@@ -94,7 +94,7 @@ Vagrant::DEFAULT_SERVER_URL.replace('https://vagrantcloud.com')
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.hostmanager.enabled = true
   config.vm.box = "centos/7"
-  config.vm.box_version = "1801.02"
+  config.vm.box_version = "1804.02"
   config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
   boxes.each do |opts|
     config.vm.define opts[:name] do |box|
@@ -173,8 +173,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       box.trigger.after :up, :stdout => true, :stderr => true do
         password_cmd = "sudo ./setup_passwords.sh vagrant"
         # prepare_cmd = "./prepare.sh #{username}"
-        # run "vagrant ssh dockerenv -c \"cd ~; #{password_cmd} && cd ~/docker && #{prepare_cmd}\""
-        run "vagrant ssh dockerenv -c \"cd ~; #{password_cmd}\""
+        # run "vagrant ssh djhenv -c \"cd ~; #{password_cmd} && cd ~/docker && #{prepare_cmd}\""
+        run "vagrant ssh djhenv -c \"cd ~; #{password_cmd}\""
       end
     end
   end

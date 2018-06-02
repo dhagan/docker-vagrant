@@ -2,10 +2,10 @@ version: "3.3"
 
 services:
   tas-gateway:
-    # image: tas/gateway
-    build: 
-     context: ./workspace/tas-gateway
-     dockerfile: Dockerfile
+    image: tas/gateway
+    # build: 
+    #  context: ./workspace/tas-gateway
+    #  dockerfile: Dockerfile
     container_name: tas-gateway
     volumes:
      - ./workspace/tas-gateway/nginx.conf:/etc/nginx/conf.d/default.conf
@@ -44,15 +44,15 @@ services:
   #   depends_on:
   #       - tas-gateway
 
-  #tas-queue:
-  #  image: rabbitmq:3.7.4-management-alpine
-  #  network_mode: service:tas-gateway
-  #  environment:
-  #    - RABBITMQ_SERVER_START_ARGS=-rabbitmq_management listener [{port,15672}]
-  #    - RABBITMQ_NODENAME=out
-  #    - RABBITMQ_NODE_PORT=5672
-  #  depends_on:
-  #      - tas-gateway
+  tas-queue:
+    image: rabbitmq:3.7.4-management-alpine
+    network_mode: service:tas-gateway
+    environment:
+      - RABBITMQ_SERVER_START_ARGS=-rabbitmq_management listener [{port,15672}]
+      - RABBITMQ_NODENAME=out
+      - RABBITMQ_NODE_PORT=5672
+    depends_on:
+        - tas-gateway
 
   # tas-queue-in:
   #   image: rabbitmq:3.7.4-management-alpine
@@ -64,40 +64,39 @@ services:
   #   depends_on:
   #       - tas-gateway
 
-  tascore-api:
-     # image: tascore-api
-    build:
-      context: ./workspace/tascore-api/src
-      dockerfile: Dockerfile.dev
-    container_name: tascore-api
-    volumes:
-       - /lib64/:/lib64/
-       - ./workspace/tascore-api/src:/var/app
-       # - ./workspace/tascore-api-logs:/var/log/tas
-       # cap_add:
-       #   - net_bind_service
-       # cap_drop:
-     #   - ALL
-    environment:
-       - "PORT=3001"
-       - "DEBUG=api,api-internal,cache,example,azure,data,fs,core,memory,security,webclient,errors"
-       # - "TAS_QUEUE_ADDRESS=amqp://127.0.0.1:5672"
-       - "TAS_ENABLE_HTTP=true"
-       # - "TAS_ACTIVATE=logging,health,metrics"
-       - "TAS_FILESYSTEM_DATA_ROOT=/var/log/tas"
-       - "TAS_PROVIDERS=LOGGING:azure,CONFIG:azure"
-       - "TAS_AZURE_STORAGE_NAME=tasstorage01"
-       - "TAS_AZURE_STORAGE_KEY=qv8Tkil0Q51dXK7GZS+ehia/kw+omMy7j4QiP2IeWtW6dD+jJ3CYLux9dNdXdl7wsvr3Ew9XLPiKsER06MnDWQ=="
-       # - "TAS_ELASTICSEARCH_CONNECTION_STRING=http://10.1.2.1:9200"
-       - "TAS_APPLICATION_LOGIN_URL=http://10.1.2.1:9200"
-       - "TAS_HAPI_FHIR_URL=http://aws-app.mccf.halfakerlabs.com:8080/VA-FHIR-Server/fhir"
-       - "TAS_KV_VAULT_NAME=taskv"
-       - "TAS_KV_APPLICATION_ID=aba20131-ec85-408d-a5f8-6cb6daea97b7"
-       - "TAS_KV_SECRET=0NNgUiZYAe83L7d/m+P03VoW9N3b0crjXy26/aPeTuY="
-       - "TAS_FHIR_URL=http://aws-app.mccf.halfakerlabs.com:8080/VA-FHIR-Server/fhir"
-    network_mode: service:tas-gateway
-    depends_on:
-       - tas-gateway
+  # tascore-api:
+  #   # image: tascore-api
+  #   build:
+  #    context: ./workspace/tascore-api/src
+  #    dockerfile: Dockerfile.dev
+  #   container_name: tascore-api
+  #   volumes:
+  #     - /lib64/:/lib64/
+  #     - ./workspace/tascore-api/src:/var/app
+  #     # - ./workspace/tascore-api-logs:/var/log/tas
+  #   # cap_add:
+  #   #   - net_bind_service
+  #   # cap_drop:
+  #   #   - ALL
+  #   environment:
+  #     - "PORT=3001"
+  #     - "DEBUG=api,api-internal,cache,example,azure,data,fs,core,memory,security,webclient,errors"
+  #     # - "TAS_QUEUE_ADDRESS=amqp://127.0.0.1:5672"
+  #     - "TAS_ENABLE_HTTP=true"
+  #     # - "TAS_ACTIVATE=logging,health,metrics"
+  #     - "TAS_FILESYSTEM_DATA_ROOT=/var/log/tas"
+  #     - "TAS_PROVIDERS=LOGGING:azure,CONFIG:azure"
+  #     - "TAS_AZURE_STORAGE_NAME=tasstorage01"
+  #     - "TAS_AZURE_STORAGE_KEY=qv8Tkil0Q51dXK7GZS+ehia/kw+omMy7j4QiP2IeWtW6dD+jJ3CYLux9dNdXdl7wsvr3Ew9XLPiKsER06MnDWQ=="
+  #     # - "TAS_ELASTICSEARCH_CONNECTION_STRING=http://10.1.2.1:9200"
+  #     - "TAS_APPLICATION_LOGIN_URL=http://10.1.2.1:9200"
+  #     - "TAS_HAPI_FHIR_URL=http://aws-app.mccf.halfakerlabs.com:8080/VA-FHIR-Server/fhir"
+  #     - "TAS_KV_VAULT_NAME=taskv"
+  #     - "TAS_KV_APPLICATION_ID=aba20131-ec85-408d-a5f8-6cb6daea97b7"
+  #     - "TAS_KV_SECRET=0NNgUiZYAe83L7d/m+P03VoW9N3b0crjXy26/aPeTuY="
+  #   network_mode: service:tas-gateway
+  #   depends_on:
+  #       - tas-gateway
 
   # tas-config:
   #   build:
@@ -151,12 +150,12 @@ services:
   #   depends_on:
   #       - tas-gateway
 
-  #tas-cosmosdb-emulator:
-  #  image: mongo:3.6
-  #  container_name: tas-cosmosdb-emulator
-  #  network_mode: service:tas-gateway
-  #  depends_on:
-  #      - tas-gateway
+  tas-cosmosdb-emulator:
+    image: mongo:3.6
+    container_name: tas-cosmosdb-emulator
+    network_mode: service:tas-gateway
+    depends_on:
+        - tas-gateway
 
   # tascore-ui:
   #   build: 
@@ -175,35 +174,35 @@ services:
   #   depends_on:
   #       - tas-gateway
 
- # sb:
- #   # image: tas/sb
- #   build:
- #    context: ./workspace/sb/src
- #    dockerfile: Dockerfile.dev
- #   container_name: sb
- #   volumes:
- #     - ./workspace/sb/src:/var/app
+  sb:
+    # image: tas/sb
+    build:
+     context: ./workspace/sb/src
+     dockerfile: Dockerfile.dev
+    container_name: sb
+    volumes:
+      - ./workspace/sb/src:/var/app
     # cap_add:
     #   - net_bind_service
     # cap_drop:
     #   - ALL
- #   environment:
- #     - "PORT=3002"
- #     - "DEBUG=api,sbtest,api-internal,amqp,azure,data,fs,core,memory,webclient,security,errors,example"
- #     # - "TAS_COSMOSDB_CONNECTION_STRING=mongodb://10.1.2.1:27017"
- #     - "TAS_QUEUE_ADDRESS=amqp://127.0.0.1:5672"
- #     - "TAS_ENABLE_HTTP=true"
- #     # - "NODE_ENV=production"
- #     #- "TAS_ACTIVATE=burrito"
- #     - "TAS_FILESYSTEM_DATA_ROOT=/var/log/tas"
- #     - "TAS_PROVIDERS=EXAMPLE:memory,LOGGING:memory,CONFIG:azure"
- #     - "TAS_AZURE_STORAGE_NAME=tasstorage01"
- #     - "TAS_AZURE_STORAGE_KEY=qv8Tkil0Q51dXK7GZS+ehia/kw+omMy7j4QiP2IeWtW6dD+jJ3CYLux9dNdXdl7wsvr3Ew9XLPiKsER06MnDWQ=="
- #     - "TAS_API_KEY=ABCDEF"
- #     - "TAS_FHIR_URL=http://aws-app.mccf.halfakerlabs.com:8080/VA-FHIR-Server/fhir"
- #   network_mode: service:tas-gateway
- #   depends_on:
- #       - tas-gateway
+    environment:
+      - "PORT=3002"
+      - "DEBUG=api,sbtest,api-internal,amqp,azure,data,fs,core,memory,webclient,security,errors,example"
+      # - "TAS_COSMOSDB_CONNECTION_STRING=mongodb://10.1.2.1:27017"
+      - "TAS_QUEUE_ADDRESS=amqp://127.0.0.1:5672"
+      - "TAS_ENABLE_HTTP=true"
+      # - "NODE_ENV=production"
+      #- "TAS_ACTIVATE=burrito"
+      - "TAS_FILESYSTEM_DATA_ROOT=/var/log/tas"
+      - "TAS_PROVIDERS=EXAMPLE:memory,LOGGING:memory,CONFIG:azure"
+      - "TAS_AZURE_STORAGE_NAME=tasstorage01"
+      - "TAS_AZURE_STORAGE_KEY=qv8Tkil0Q51dXK7GZS+ehia/kw+omMy7j4QiP2IeWtW6dD+jJ3CYLux9dNdXdl7wsvr3Ew9XLPiKsER06MnDWQ=="
+      - "TAS_API_KEY=ABCDEF"
+      - "TAS_FHIR_URL=http://aws-app.mccf.halfakerlabs.com:8080/VA-FHIR-Server/fhir"
+    network_mode: service:tas-gateway
+    depends_on:
+        - tas-gateway
 
   # sbexample:
   #   build:
