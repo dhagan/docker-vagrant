@@ -1,0 +1,19 @@
+version: "3.3"
+
+services:
+  queue:
+    image: rabbitmq:3.7.7-management
+    restart: unless-stopped
+    environment:
+      - RABBITMQ_SERVER_START_ARGS=-rabbitmq_management listener [{port,15672}]
+      # https://github.com/docker-library/rabbitmq/issues/6
+      #- RABBITMQ_NODENAME=node01
+      - RABBITMQ_NODE_PORT=5672
+      - RABBITMQ_DEFAULT_USER=tasuser
+      - RABBITMQ_DEFAULT_PASS=password
+    command: ["rabbitmq-server", "--name", "rabbitmq-node01", "--hostname", "rabbitmq-node01" ]
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+     - /srv/queue01:/var/lib/rabbitmq
